@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  web:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      -"8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    environment:
+      - DEBUG=True
+      - DB_NAME=ecom
+      - DB_USER=tommi
+      - DB_PASSWORD=209325
+      - DB_NAME_HOST=localhost
+      - DB_PORT=3306
+      - SECRET_KEY =SECRET_KEY
+      - ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+      
+  db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD: password
+      - MYSQL_DATABASE=django_db
+      - MYSQL_USER=django_user
+      - MYSQL_PASSWORD=django_password
+    ports:
+      - "3306:3306"  
+    volumes:
+      - data:/var/lib/mysql  
+volumes:
+  mysql_data:
