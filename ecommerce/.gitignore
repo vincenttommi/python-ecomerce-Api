@@ -1,0 +1,31 @@
+# Environment variables
+.env
+env
+
+# Django specific
+/staticfiles/
+/media/
+/db.sqlite3
+
+# Python specific
+*.py[cod]
+__pycache__/
+*.pyo
+
+# Virtual environments
+venv/
+env/
+
+# IDE and editor specific
+.vscode/
+.idea/
+
+# Logs and caches
+*.log
+*.cache
+
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
