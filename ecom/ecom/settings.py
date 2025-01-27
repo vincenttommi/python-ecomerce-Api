@@ -156,3 +156,14 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')  # Gmail address
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD') 
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 
+
+# REST framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PARSER_CLASSES':[
+        'rest_framework.parsers.JSONParser',
+    ],
+    
+}

@@ -12,7 +12,19 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+
+        # Ensure required fields are present
+        first_name = extra_fields.pop('first_name', None)
+        last_name = extra_fields.pop('last_name', None)
+        if not first_name or not last_name:
+            raise ValueError('First name and last name are required')
+
+        user = self.model(
+            email=email, 
+            first_name=first_name, 
+            last_name=last_name,
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -30,5 +42,6 @@ class UserManager(BaseUserManager):
             raise ValueError('Superuser must have is_superuser=True.')
 
         return self.create_user(email, password, **extra_fields)
+
 
         
