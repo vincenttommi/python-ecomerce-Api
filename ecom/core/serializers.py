@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User,Profile
 from rest_framework.exceptions import AuthenticationFailed
 from  django.urls import reverse
 from django.contrib.auth import authenticate
@@ -12,46 +12,66 @@ from .utils import send_normal_email
 from  rest_framework_simplejwt.tokens import RefreshToken,TokenError
 
 
+from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
+from .models import User, Profile  # Import your models
 
-class UserRegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=20, min_length=6, write_only=True)
-    password2 = serializers.CharField(max_length=20, min_length=6, write_only=True)
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+    accountType = serializers.ChoiceField(choices=[('user', 'User'), ('admin', 'Admin'), ('instructor', 'Instructor')], required=True)
+
+    # Read fields from Profile
+    country = serializers.CharField(source="profile.country", required=True)
+    countryCode = serializers.CharField(source="profile.countryCode", required=True)
+    state = serializers.CharField(source="profile.state", required=True)
+    address = serializers.CharField(source="profile.address", required=True)
+    phoneNumber = serializers.CharField(source="profile.phoneNumber", required=True)
 
     class Meta:
         model = User
-        fields = [
-            'email', 'password', 'password2', 'first_name', 'last_name', 'accountType', 'country',
-            'countryCode', 'state', 'address', 'phoneNumber'
-        ]
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name', 'accountType',
+                  'country', 'countryCode', 'state', 'address', 'phoneNumber']
 
-    def validate(self, attrs):
-        password = attrs.get('password', '')
-        password2 = attrs.get('password2', '')
-
-        if password != password2:
+    def validate(self, data):
+        if data['password'] != data['password2']:
             raise serializers.ValidationError({"password": "Passwords do not match"})
-
-        return attrs
+        return data
 
     def create(self, validated_data):
-        validated_data.pop('password2', None)  # Ensure no KeyError
+        profile_data = validated_data.pop('profile', {})  # Extract profile data
+        password = validated_data.pop('password')
+        validated_data.pop('password2')  # Remove password2 since it's not in the User model
 
-        user = User.objects.create_user(
-            email=validated_data['email'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
-            password=validated_data['password'],
-            accountType=validated_data['accountType'],
-            country=validated_data['country'],
-            countryCode=validated_data['countryCode'],
-            state=validated_data['state'],
-            address=validated_data['address'],
-            phoneNumber=validated_data['phoneNumber']
+        # Create User
+        user = User.objects.create(
+            **validated_data,
+            password=make_password(password)  # Hash password
         )
+
+        # Create Profile and link it to the User
+        Profile.objects.create(user=user, **profile_data)
 
         return user
 
+    def to_representation(self, instance):
+        """ Modify response to include profile fields """
+        data = super().to_representation(instance)
 
+        # Get related profile
+        try:
+            profile = instance.profile
+            data.update({
+                "country": profile.country,
+                "countryCode": profile.countryCode,
+                "state": profile.state,
+                "address": profile.address,
+                "phoneNumber": profile.phoneNumber
+            })
+        except Profile.DoesNotExist:
+            pass  # If no profile exists, skip this step
+
+        return data
 
 
 class LoginSerializer(serializers.Serializer):
@@ -185,3 +205,10 @@ class SetNewPasswordSerializer(serializers.Serializer):
         user.set_password(validated_data['password'])
         user.save()
         return user    
+    
+    
+    
+    
+    
+
+
