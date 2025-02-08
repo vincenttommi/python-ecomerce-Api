@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,Profile
+from .models import User,Profile,Product
 from rest_framework.exceptions import AuthenticationFailed
 from  django.urls import reverse
 from django.contrib.auth import authenticate
@@ -209,6 +209,13 @@ class SetNewPasswordSerializer(serializers.Serializer):
     
     
     
+    
+
+class productSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product    
+        fields = ['title','price','tags','description','created_at']
+        
     
 
 
