@@ -6,19 +6,12 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 
 
-DB_NAME = config('DB_NAME')
-DB_USER = config('DB_USER')
-DB_PASSWORD = config('DB_PASSWORD')
-DB_HOST = config('DB_HOST')
-DB_PORT = config('DB_PORT')
 
 
 # Application definition
@@ -35,6 +28,15 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     
+    
+]
+# Use nose to run all tests
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+# Tell nose to measure coverage on the 'foo' and 'bar' apps
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=foo,bar',
 ]
 
 MIDDLEWARE = [
@@ -74,19 +76,19 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-port_value = config('DB_PORT', default='3306').strip()
-print(f"DB_PORT: '{port_value}'")  # Add this print statement
+
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': int(port_value),  
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
+
 SECRET_KEY = config('SECRET_KEY')
 
 
@@ -146,6 +148,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
     "UPDATE_LAST_LOGIN": True,
+    
 }
 
 
@@ -184,3 +187,9 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+
+
+
+
+
+AUTH_USER_MODEL = 'core.CustomUser'

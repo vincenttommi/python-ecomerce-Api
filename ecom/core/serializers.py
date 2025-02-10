@@ -32,3 +32,13 @@ class RegisterSerializer(serializers.ModelSerializer):
                 }
             }
         }
+
+
+
+
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['email', 'name', 'account_type', 'country', 'state', 'phone_number']
