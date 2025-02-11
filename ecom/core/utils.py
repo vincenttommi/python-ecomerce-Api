@@ -2,7 +2,7 @@ import random
 from django.core.mail import EmailMessage
 from django.core.mail import BadHeaderError
 from   ecom import settings
-from .models import User, OneTimePassword
+from .models import CustomUser, OneTimePassword
 
 
 def generate_otp():
@@ -17,8 +17,8 @@ def send_code_to_user(email):
     print(f"Generated OTP: {otp_code}")  # Debugging: Print OTP to console
 
     try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
+        user = CustomUser.objects.get(email=email)
+    except CustomUser.DoesNotExist:
         return {"error": "User with this email does not exist."}
 
     current_site = "Social"

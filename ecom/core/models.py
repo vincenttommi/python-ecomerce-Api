@@ -42,3 +42,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+
+
+
+
+
+class  OneTimePassword(models.Model):
+    user  = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    code  = models.CharField(max_length=6,unique=True)
+    
+    def __str__(self):
+        return f"{self.user.first_name}-passcode"
+    
